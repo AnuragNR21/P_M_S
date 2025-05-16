@@ -1,284 +1,249 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from 'react';
 import {
-  Box,
-  Typography,
-  Paper,
-  Grid,
   TextField,
   Button,
+  Grid,
+  MenuItem,
+  Typography,
   Table,
-  TableBody,
-  TableCell,
-  TableContainer,
   TableHead,
   TableRow,
-  IconButton,
-  Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Select,
-  MenuItem,
+  TableCell,
+  TableBody,
+  TableContainer,
+  Paper,
+  Box,
+  FormControl,
   InputLabel,
-  FormControl
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
-import {
-  Download as DownloadIcon,
-  Visibility as VisibilityIcon,
-  Add as AddIcon,
-  Delete as DeleteIcon,
-  Edit as EditIcon,
-  RestartAlt as ResetIcon,
-  UploadFile as UploadFileIcon,
-  Info as InfoIcon
-} from "@mui/icons-material";
-import axios from "axios";
-import MainAppBar from "./MainAppBar";
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-
-const StyledContainer = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(3),
-  backgroundImage: "linear-gradient(135deg, rgb(254, 248, 206), rgb(249, 143, 61))",
-  minHeight: "100vh",
-  overflowY: "auto",
-  paddingTop: "80px"
-}));
+  Select
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import MainAppBar from './MainAppBar';
+import Footer from './Footer';
+import { useNavigate } from 'react-router-dom';
 
 const Card = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
-  backgroundColor: "#fff3e0",
+  backgroundColor: '#fff3e0',
   borderRadius: 16,
   boxShadow: theme.shadows[3],
   marginBottom: theme.spacing(3)
 }));
 
 export default function EmployeePage() {
-  const [employees, setEmployees] = useState([]);
-  const [newEmployee, setNewEmployee] = useState({
-    name: "",
-    dob: "",
-    primaryContact: "",
-    maritalStatus: "No",
-    spouseName: "",
-    emergencyContact: "",
-    permanentAddress: "",
-    presentAddress: "",
-    aadhaarCard: "",
-    panCard: "",
-    bankAccount: "",
-    ifscCode: ""
+  const [formData, setFormData] = useState({
+    empId: '',
+    empName: '',
+    designation: '',
+    doj: '',
+    location: '',
+    pan: '',
+    uan: '',
+    bankAccount: '',
+    aadhar: '',
+    dob: '',
+    email: '',
+    primarycontact: '',
+    maritalstatus: 'No',
+    spousesname: '',
+    emergencycontactname: '',
+    permanentaddress: '',
+    presentaddress: '',
+    ifsccode: ''
   });
-  const [editingIndex, setEditingIndex] = useState(null);
-  const [salaryInfoOpen, setSalaryInfoOpen] = useState(false);
 
-  const handleInputChange = (e) => {
+  const [employees, setEmployees] = useState([]);
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewEmployee({ ...newEmployee, [name]: value });
+    setFormData({ ...formData, [name]: value });
   };
 
-  const fetchEmployees = async () => {
-    try {
-      const res = await axios.get(`${API_BASE_URL}/api/employees`);
-      setEmployees(res.data);
-    } catch (err) {
-      console.error("Failed to fetch employees", err);
-    }
-  };
-
-  const addOrUpdateEmployee = () => {
-    if (editingIndex !== null) {
-      const updated = [...employees];
-      updated[editingIndex] = newEmployee;
-      setEmployees(updated);
-      setEditingIndex(null);
-    } else {
-      setEmployees([...employees, newEmployee]);
-    }
-    setNewEmployee({
-      name: "",
-      dob: "",
-      primaryContact: "",
-      maritalStatus: "No",
-      spouseName: "",
-      emergencyContact: "",
-      permanentAddress: "",
-      presentAddress: "",
-      aadhaarCard: "",
-      panCard: "",
-      bankAccount: "",
-      ifscCode: ""
+  const handleAdd = () => {
+    setEmployees([...employees, formData]);
+    setFormData({
+      empId: '',
+      empName: '',
+      designation: '',
+      doj: '',
+      location: '',
+      pan: '',
+      uan: '',
+      bankAccount: '',
+      aadhar: '',
+      dob: '',
+      email: '',
+      primarycontact: '',
+      maritalstatus: 'No',
+      spousesname: '',
+      emergencycontactname: '',
+      permanentaddress: '',
+      presentaddress: '',
+      ifsccode: ''
     });
   };
 
-  const editEmployee = (index) => {
-    setNewEmployee(employees[index]);
-    setEditingIndex(index);
-  };
-
-  const deleteEmployee = (index) => {
-    const updated = [...employees];
-    updated.splice(index, 1);
+  const handleDelete = (index) => {
+    const updated = employees.filter((_, i) => i !== index);
     setEmployees(updated);
   };
 
-  const resetPassword = (emp) => {
-    alert(`Password reset email sent to ${emp.email || emp.primaryContact}@example.com (mock).`);
+  const handleUpdate = (index) => {
+    const selectedEmployee = employees[index];
+    setFormData(selectedEmployee);
+    handleDelete(index);
   };
-
-  const handleCsvUpload = () => {
-    alert("CSV upload feature coming soon. (Mock)");
-  };
-
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
 
   return (
-    <>
+    <Box sx={{ overflowX: "hidden" }}>
       <MainAppBar />
-      <StyledContainer>
-        <Card>
-          <Typography variant="h6" mb={2}>
-            {editingIndex !== null ? "Edit Employee" : "Add New Employee"}
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
-              <TextField fullWidth label="Name" name="name" value={newEmployee.name} onChange={handleInputChange} />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField fullWidth type="date" label="DOB" name="dob" value={newEmployee.dob} onChange={handleInputChange} InputLabelProps={{ shrink: true }} />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField fullWidth label="Primary Contact" name="primaryContact" value={newEmployee.primaryContact} onChange={handleInputChange} />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <FormControl fullWidth>
-                <InputLabel>Marital Status</InputLabel>
-                <Select name="maritalStatus" value={newEmployee.maritalStatus} label="Marital Status" onChange={handleInputChange}>
-                  <MenuItem value="Yes">Yes</MenuItem>
-                  <MenuItem value="No">No</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField fullWidth label="Spouse Name" name="spouseName" value={newEmployee.spouseName} onChange={handleInputChange} disabled={newEmployee.maritalStatus === "No"} />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField fullWidth label="Emergency Contact" name="emergencyContact" value={newEmployee.emergencyContact} onChange={handleInputChange} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField fullWidth label="Permanent Address" name="permanentAddress" value={newEmployee.permanentAddress} onChange={handleInputChange} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField fullWidth label="Present Address" name="presentAddress" value={newEmployee.presentAddress} onChange={handleInputChange} />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField fullWidth label="Aadhaar Card" name="aadhaarCard" value={newEmployee.aadhaarCard} onChange={handleInputChange} />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField fullWidth label="PAN Card" name="panCard" value={newEmployee.panCard} onChange={handleInputChange} />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField fullWidth label="Bank Account No." name="bankAccount" value={newEmployee.bankAccount} onChange={handleInputChange} />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField fullWidth label="IFSC Code" name="ifscCode" value={newEmployee.ifscCode} onChange={handleInputChange} />
-            </Grid>
+      <Paper sx={{ mt: 10, px: 4, py: 3, pt: 10, boxSizing: 'border-box', margin: '12px' }}>
+        <Typography variant="h5" gutterBottom>
+          Employee Details
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="Employee ID" name="empId" value={formData.empId} onChange={handleChange} />
           </Grid>
-          <Box mt={2} display="flex" gap={2}>
-            <Button variant="contained" onClick={addOrUpdateEmployee} startIcon={<AddIcon />} sx={{ backgroundColor: "#f79635" }}>
-              {editingIndex !== null ? "Update" : "Add"} Employee
-            </Button>
-            <Button variant="outlined" startIcon={<UploadFileIcon />} onClick={handleCsvUpload}>
-              Import CSV
-            </Button>
-            <Tooltip title="How salary is calculated">
-              <IconButton onClick={() => setSalaryInfoOpen(true)}>
-                <InfoIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </Card>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="Name" name="empName" value={formData.empName} onChange={handleChange} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="Email" name="email" value={formData.email} onChange={handleChange} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth type="date" label="DOB" name="dob" value={formData.dob} onChange={handleChange} InputLabelProps={{ shrink: true }} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="Primary Contact" name="primarycontact" value={formData.primarycontact} onChange={handleChange} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <FormControl fullWidth>
+              <InputLabel>Marital Status</InputLabel>
+              <Select name="maritalstatus" value={formData.maritalstatus} label="Marital Status" onChange={handleChange}>
+                <MenuItem value="Yes">Yes</MenuItem>
+                <MenuItem value="No">No</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="Spouse Name" name="spousesname" value={formData.spousesname} onChange={handleChange} disabled={formData.maritalstatus === "No"} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="Emergency Contact" name="emergencycontactname" value={formData.emergencycontactname} onChange={handleChange} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="Permanent Address" name="permanentaddress" value={formData.permanentaddress} onChange={handleChange} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="Present Address" name="presentaddress" value={formData.presentaddress} onChange={handleChange} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="Aadhar" name="aadhar" value={formData.aadhar} onChange={handleChange} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="PAN" name="pan" value={formData.pan} onChange={handleChange} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="UAN" name="uan" value={formData.uan} onChange={handleChange} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="Bank A/c No." name="bankAccount" value={formData.bankAccount} onChange={handleChange} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="IFSC Code" name="ifsccode" value={formData.ifsccode} onChange={handleChange} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="Designation" name="designation" value={formData.designation} onChange={handleChange} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField fullWidth label="Location" name="location" value={formData.location} onChange={handleChange} />
+          </Grid>
+         <Grid item xs={12} md={4}>
+              <TextField fullWidth type="date" label="Joining Date" name="doj" value={formData.doj} onChange={handleChange} InputLabelProps={{ shrink: true }} />
 
-        <Card>
-          <Typography variant="h6" mb={2}>Employee List</Typography>
-          <TableContainer>
-            <Table>
-              <TableHead sx={{ backgroundColor: "#f79635" }}>
-                <TableRow>
-                  <TableCell><b>Name</b></TableCell>
-                  <TableCell><b>DOB</b></TableCell>
-                  <TableCell><b>Primary Contact</b></TableCell>
-                  <TableCell><b>Marital Status</b></TableCell>
-                  <TableCell><b>Spouse</b></TableCell>
-                  <TableCell><b>Emergency Contact</b></TableCell>
-                  <TableCell><b>Actions</b></TableCell>
+            </Grid>
+
+          
+          <Grid item xs={12}>
+            <Button variant="contained" onClick={handleAdd} sx={{ backgroundColor: '#FF9800', color: '#fff', '&:hover': { backgroundColor: '#FB8C00' } }}>
+              Add
+            </Button>
+          </Grid>
+        </Grid>
+
+        <TableContainer component={Paper} sx={{ mt: 4 }}>
+          <Table size="small">
+            <TableHead sx={{ backgroundColor: 'rgb(248, 185, 133)' }}>
+              <TableRow>
+                <TableCell>EmpID</TableCell>
+                <TableCell>EmpName</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>DOB</TableCell>
+                <TableCell>Contact</TableCell>
+                <TableCell>Designation</TableCell>
+                <TableCell>DOJ</TableCell>
+                <TableCell>Location</TableCell>
+                <TableCell>BankAccount</TableCell>
+                <TableCell>PAN</TableCell>
+                <TableCell>UAN</TableCell>
+                <TableCell>IFSC</TableCell>
+                <TableCell>Marital Status</TableCell>
+                <TableCell>Spouse Name</TableCell>
+                <TableCell>Emergency Contact</TableCell>
+                <TableCell>Permanent Address</TableCell>
+                <TableCell>Present Address</TableCell>
+                <TableCell align="center">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody sx={{ backgroundColor: 'rgb(245, 216, 193)' }}>
+              {employees.map((emp, index) => (
+                <TableRow key={index}>
+                  <TableCell>{emp.empId}</TableCell>
+                  <TableCell>{emp.empName}</TableCell>
+                  <TableCell>{emp.email}</TableCell>
+                  <TableCell>{emp.dob}</TableCell>
+                  <TableCell>{emp.primarycontact}</TableCell>
+                  <TableCell>{emp.designation}</TableCell>
+                  <TableCell>{emp.doj}</TableCell>
+                  <TableCell>{emp.location}</TableCell>
+                  <TableCell>{emp.bankAccount}</TableCell>
+                  <TableCell>{emp.pan}</TableCell>
+                  <TableCell>{emp.uan}</TableCell>
+                  <TableCell>{emp.ifsccode}</TableCell>
+                  <TableCell>{emp.maritalstatus}</TableCell>
+                  <TableCell>{emp.spousesname}</TableCell>
+                  <TableCell>{emp.emergencycontactname}</TableCell>
+                  <TableCell>{emp.permanentaddress}</TableCell>
+                  <TableCell>{emp.presentaddress}</TableCell>
+                  <TableCell align="center">
+                    <Button color="primary" onClick={() => handleUpdate(index)}>
+                      Update
+                    </Button>
+                    <Button color="error" onClick={() => handleDelete(index)}>
+                      Delete
+                    </Button>
+                  </TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {employees.map((emp, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell>{emp.name}</TableCell>
-                    <TableCell>{emp.dob}</TableCell>
-                    <TableCell>{emp.primaryContact}</TableCell>
-                    <TableCell>{emp.maritalStatus}</TableCell>
-                    <TableCell>{emp.spouseName}</TableCell>
-                    <TableCell>{emp.emergencyContact}</TableCell>
-                    <TableCell>
-                      <Tooltip title="Edit">
-                        <IconButton onClick={() => editEmployee(idx)}>
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete">
-                        <IconButton onClick={() => deleteEmployee(idx)}>
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Reset Password">
-                        <IconButton onClick={() => resetPassword(emp)}>
-                          <ResetIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="View Payslip">
-                        <IconButton>
-                          <VisibilityIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Download Payslip">
-                        <IconButton>
-                          <DownloadIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Card>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
-        <Dialog open={salaryInfoOpen} onClose={() => setSalaryInfoOpen(false)}>
-          <DialogTitle>Salary Calculation</DialogTitle>
-          <DialogContent>
-            <Typography>
-              Salary is calculated based on:
-              <ul>
-                <li>Base Pay</li>
-                <li>Attendance</li>
-                <li>Bonuses</li>
-                <li>Deductions: PF, Tax, Loans</li>
-              </ul>
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setSalaryInfoOpen(false)}>Close</Button>
-          </DialogActions>
-        </Dialog>
-      </StyledContainer>
-    </>
+        <Grid item xs={12} sx={{ mt: 4 }}>
+          <Button variant="contained" onClick={() => navigate('/processsalarypage')} sx={{ backgroundColor: '#FF9800', color: '#fff', '&:hover': { backgroundColor: '#FB8C00' } }}>
+            Process Salary
+          </Button>
+        </Grid>
+
+        <Grid sx={{mt:2}}>
+          <Button variant="contained" onClick={() => navigate('/salaryinfo')} sx={{ backgroundColor: '#FF9800', color: '#fff', '&:hover': { backgroundColor: '#FB8C00' } }}>
+            Employee Salary Info
+          </Button>
+        </Grid>
+      </Paper>
+      <Footer />
+    </Box>
   );
 }

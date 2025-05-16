@@ -129,7 +129,7 @@ const Task = () => {
   
 
   return (
-    <>
+    <Box sx={{overflowX:"hidden"}}>
       <MainAppBar />
       <Box
         p={3}
@@ -137,6 +137,7 @@ const Task = () => {
           backgroundColor: "#fff3e0",
           minHeight: "100vh",
           paddingTop: "100px",
+          
         }}
       >
         <Typography
@@ -207,7 +208,7 @@ const Task = () => {
           </Button>
         </Box>
 
-        <TableContainer component={Paper} sx={{ backgroundColor: "#fff8e1" }}>
+        <TableContainer component={Paper} sx={{ backgroundColor: "#fff8e1",overflowX:"hidden" }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -267,7 +268,7 @@ const Task = () => {
         </TableContainer>
       </Box>
       <Footer />
-    </>
+    </Box>
   );
 };
 

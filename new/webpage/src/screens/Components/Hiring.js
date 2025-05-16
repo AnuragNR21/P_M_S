@@ -52,7 +52,7 @@ export default function Hiring() {
       >
         {/* Hero Section */}
         <Box
-          sx={{ py: { xs: 4, sm: 6 }, textAlign: "center", background: "#fff" }}
+          sx={{ py: { xs: 4, sm: 6 }, textAlign: "center", background: "#fad7a0" }}
         >
           <Typography variant={isXs ? "h4" : "h3"} gutterBottom>
             Find Your Next Hire

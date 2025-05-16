@@ -9,6 +9,8 @@ import Performance from "./screens/Components/Performance.js";
 import HelpCenter from "./screens/Components/HelpCenter.js";
 import Hiring from "./screens/Components/Hiring.js";
 import EmployeePage from "./screens/Components/EmployeePage.js";
+import ProcessSalaryPage from "./screens/Components/ProcessSalaryPage.js";
+import SalaryInfo from "./screens/Components/SalaryInfo.js";
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
         <Route path="/helpcenter" element={<HelpCenter />} />
         <Route path="/hiring" element={<Hiring />} />
         <Route path="/employeepage" element={<EmployeePage   />} />
+        <Route path="/processsalarypage" element={<ProcessSalaryPage />} />
+        <Route path="/salaryinfo" element={<SalaryInfo />} />
       </Routes>
     </BrowserRouter>
   );
